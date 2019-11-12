@@ -167,7 +167,8 @@ jQuery(function($){
     // Note: You have to change the host var 
     // if your client runs on a different machine than the websocket server
     
-    var host = "ws://localhost:9090/ws";
+    // var host = "ws://localhost:80/ws";
+    var host = "ws://"+window.location.host+"/ws";
     var socket = new WebSocket(host);
     //console.log("socket status: " + socket.readyState);   
     
