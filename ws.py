@@ -72,7 +72,7 @@ def start_ws_server():
         (r'/', MainHandler),
         (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./resources"}),
         ])
-            application.listen(9090)
+            application.listen(80)
             tornado.ioloop.IOLoop.instance().start()
     
     start()
