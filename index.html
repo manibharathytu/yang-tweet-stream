@@ -1,0 +1,226 @@
+<!-- <!DOCTYPE HTML>
+
+<html>
+   <head>
+      
+      <script type = "text/javascript">
+         function WebSocketTest() {
+            
+            if ("WebSocket" in window) {
+               alert("WebSocket is supported by your Browser!");
+               
+               // Let us open a web socket
+               var ws = new WebSocket("ws://localhost:9998/echo");
+				
+               ws.onopen = function() {
+                  
+                  // Web Socket is connected, send data using send()
+                  ws.send("Message to send");
+                  alert("Message is sent...");
+               };
+				
+               ws.onmessage = function (evt) { 
+                  var received_msg = evt.data;
+                  alert("Message is received...");
+               };
+				
+               ws.onclose = function() { 
+                  
+                  // websocket is closed.
+                  alert("Connection is closed..."); 
+               };
+            } else {
+              
+               // The browser doesn't support WebSocket
+               alert("WebSocket NOT supported by your Browser!");
+            }
+         }
+      </script>
+		
+   </head>
+   
+   <body>
+      <div id = "sse">
+         <a href = "javascript:WebSocketTest()">Run WebSocket</a>
+      </div>
+      
+   </body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+
+<meta charset="utf-8" />
+
+<title>WebSocket Test</title>
+
+<script language="javascript" type="text/javascript">
+  function init()
+  {
+	document.myform.url.value = "ws://localhost:8000/"
+	document.myform.inputtext.value = "Hello World!"
+	document.myform.disconnectButton.disabled = true;
+  }
+  function doConnect()
+  {
+    websocket = new WebSocket(document.myform.url.value);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+  function onOpen(evt)
+  {
+    writeToScreen("connected\n");
+	document.myform.connectButton.disabled = true;
+	document.myform.disconnectButton.disabled = false;
+  }
+  function onClose(evt)
+  {
+    writeToScreen("disconnected\n");
+	document.myform.connectButton.disabled = false;
+	document.myform.disconnectButton.disabled = true;
+  }
+  function onMessage(evt)
+  {
+    writeToScreen("response: " + evt.data + '\n');
+  }
+  function onError(evt)
+  {
+    writeToScreen('error: ' + evt.data + '\n');
+	websocket.close();
+	document.myform.connectButton.disabled = false;
+	document.myform.disconnectButton.disabled = true;
+  }
+  function doSend(message)
+  {
+    writeToScreen("sent: " + message + '\n'); 
+    websocket.send(message);
+  }
+  function writeToScreen(message)
+  {
+    document.myform.outputtext.value += message
+	document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
+  }
+  window.addEventListener("load", init, false);
+   function sendText() {
+		doSend( document.myform.inputtext.value );
+   }
+  function clearText() {
+		document.myform.outputtext.value = "";
+   }
+   function doDisconnect() {
+		websocket.close();
+   }
+</script>
+
+<div id="output"></div>
+
+<form name="myform">
+<p>
+<textarea name="outputtext" rows="20" cols="50"></textarea>
+</p>
+<p>
+<textarea name="inputtext" cols="50"></textarea>
+</p>
+<p>
+<textarea name="url" cols="50"></textarea>
+</p>
+<p>
+<input type="button" name=sendButton value="Send" onClick="sendText();">
+<input type="button" name=clearButton value="Clear" onClick="clearText();">
+<input type="button" name=disconnectButton value="Disconnect" onClick="doDisconnect();">
+<input type="button" name=connectButton value="Connect" onClick="doConnect();">
+</p>
+
+
+</form>
+</html>  -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSockets Client</title>  
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+</head>
+<body>
+<!-- Enter text to send to the websocket server:
+<div id="send">
+    <input type="text" id="data" size="100"/><br>
+    <input type="button" id="sendtext" value="send text"/>
+</div> -->
+<div id="output"></div>
+</body>
+</html>
+<script>
+
+jQuery(function($){
+
+  if (!("WebSocket" in window)) {
+    alert("Your browser does not support web sockets");
+  }else{
+    setup();
+  }
+
+
+  function setup(){
+   
+    // Note: You have to change the host var 
+    // if your client runs on a different machine than the websocket server
+    
+    var host = "ws://localhost:9090/ws";
+    var socket = new WebSocket(host);
+    //console.log("socket status: " + socket.readyState);   
+    
+   //  var $txt = $("#data");
+   //  var $btnSend = $("#sendtext");
+
+   //  $txt.focus();
+
+   //  // event handlers for UI
+   //  $btnSend.on('click',function(){
+   //    var text = $txt.val();
+   //    if(text == ""){
+   //      return;
+   //    }
+   //    socket.send(text);
+   //    $txt.val("");    
+   //  });
+
+   //  $txt.keypress(function(evt){
+   //    if(evt.which == 13){
+   //      $btnSend.click();
+   //    }
+   //  });
+
+    // event handlers for websocket
+    if(socket){
+
+      socket.onopen = function(){
+        //alert("connection opened....");
+      }
+
+      socket.onmessage = function(msg){
+        showServerResponse(msg.data);
+      }
+
+      socket.onclose = function(){
+        //alert("connection closed....");
+        showServerResponse("The connection has been closed.");
+      }
+
+    }else{
+      console.log("invalid socket");
+    }
+
+    function showServerResponse(txt){
+      var p = document.createElement('p');
+      p.innerHTML = txt;
+      document.getElementById('output').appendChild(p); 
+    }	
+
+
+  }
+
+});
+
+</script>
