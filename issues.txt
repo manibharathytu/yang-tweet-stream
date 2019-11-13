@@ -1,0 +1,4 @@
+issues faced :
+crashed on Nov 13, Not able to access both in port 80 and 22. Had to reboot from azure portal
+tweepy 401 error - time mismatch
+420 tweepy error in local- using same cred in local and live?
