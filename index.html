@@ -150,8 +150,22 @@
     <input type="text" id="data" size="100"/><br>
     <input type="button" id="sendtext" value="send text"/>
 </div> -->
-  <div id="lb"></div>
-  <div id="output"></div>
+
+<div style="width: 100%; overflow: hidden;">
+  <div id="output" style="width: 70%; height:500px; float: left;overflow: scroll;"> <h2>Live Yang Gang tweets stream</h2> </div>
+  <div id="lb" style="margin-left: 75%; height:500px;overflow: scroll;"> <h2>Daily Leaderboard</h2>
+  <table>
+    <thead>
+      <td><h3>Yangsta Name</h3></td>
+      <td><b>Tweets</b></td>
+    </thead>
+    <tbody id="lb_tbody">
+
+    </tbody>
+  </table> </div>
+</div>
+  <div ></div>
+  <div ></div>
 </body>
 
 </html>
@@ -205,10 +219,11 @@
         }
 
         socket.onmessage = function (msg) {
-          if (JSON.parse(msg.data)['lb']) {
-            updateLeaderBoard(msg.data)
+          json= JSON.parse(msg.data)
+          if (json['lb']) {
+            updateLeaderBoard(json['lb'])
           }
-          else { showTweet(msg.data); }
+          else { showTweet(json); }
         }
 
         socket.onclose = function () {
@@ -220,9 +235,9 @@
         console.log("invalid socket");
       }
 
-      function showTweet(txt) {
+      function showTweet(tweet) {
         var p = document.createElement('p');
-        p.innerHTML = txt;
+        p.innerHTML = '<b>'+tweet.username+'</b>' + ' : ' + tweet.text ;
         document.getElementById('output').appendChild(p);
       }
 
@@ -232,6 +247,50 @@
 
   });
   function updateLeaderBoard(msg) {
-        document.getElementById('lb').innerHTML = msg;
+    var names = [];
+    var tweets = [];
+    let bubbleSort = (inputArr) => {
+    let len = inputArr.length;
+    let swapped;
+    do {
+        swapped = false;
+        for (let i = 0; i < len; i++) {
+            if (inputArr[i] < inputArr[i + 1]) {
+                let tmp = inputArr[i];
+                let tmp1 = names[i];
+                inputArr[i] = inputArr[i + 1];
+                names[i] = names[i + 1];
+                inputArr[i + 1] = tmp;
+                names[i + 1] = tmp1;
+                swapped = true;
+            }
+        }
+    } while (swapped);
+    return inputArr;
+};
+    function sortByValue(jsObj){
+
+    for(var i in jsObj)
+    {
+        // Push each JSON Object entry in array by [value, key]
+        names.push( i);
+
+        tweets.push( parseInt(jsObj[i]));
+        
+    }
+console.log(names)
+console.log(tweets)
+    bubbleSort(tweets)
+
+    return names;
+}
+const sorted = sortByValue(msg)
+    for (var item in sorted)
+   { 
+    //  alert(item)
+    const tr = document.createElement('tr')
+     tr.innerHTML = '<td>'+sorted[item]+'</td><td>'+msg[sorted[item]]+'</td>'
+        document.getElementById('lb_tbody').append(tr)
+        }
       }
 </script>

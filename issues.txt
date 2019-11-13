@@ -2,3 +2,8 @@ issues faced :
 crashed on Nov 13, Not able to access both in port 80 and 22. Had to reboot from azure portal
 tweepy 401 error - time mismatch
 420 tweepy error in local- using same cred in local and live?
+Only lb msg comes but not the tweets - in yanggang.ga live
+urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='stream.twitter.com', port=443): Read timed out.
+
+Not clear :
+when yanggang.ga is accessed sometime 'the site cannot be reached' or empty page comes. no idea why.

@@ -51,6 +51,17 @@ def start_ws_server():
         def get(self):
             loader = tornado.template.Loader(".")
             self.write(loader.load("index.html").generate())
+        
+        # def set_default_headers(self):
+        #     print("setting headers!!!")
+        #     self.set_header("Access-Control-Allow-Origin", "*")
+        #     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        #     self.set_header('Access-Control-Allow-Methods', ' PUT, DELETE, OPTIONS')
+
+        # def options(self):
+        #     # no body
+        #     self.set_status(204)
+        #     self.finish()
 
     class WSHandler(tornado.websocket.WebSocketHandler):
         def open(self):
