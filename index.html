@@ -138,90 +138,100 @@
 
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>WebSockets Client</title>  
+  <title>Yang Gang Live tweets</title>
   <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 </head>
+
 <body>
-<!-- Enter text to send to the websocket server:
+  <!-- Enter text to send to the websocket server:
 <div id="send">
     <input type="text" id="data" size="100"/><br>
     <input type="button" id="sendtext" value="send text"/>
 </div> -->
-<div id="output"></div>
+  <div id="lb"></div>
+  <div id="output"></div>
 </body>
+
 </html>
 <script>
 
-jQuery(function($){
+  jQuery(function ($) {
 
-  if (!("WebSocket" in window)) {
-    alert("Your browser does not support web sockets");
-  }else{
-    setup();
-  }
-
-
-  function setup(){
-   
-    // Note: You have to change the host var 
-    // if your client runs on a different machine than the websocket server
-    
-    // var host = "ws://localhost:80/ws";
-    var host = "ws://"+window.location.host+"/ws";
-    var socket = new WebSocket(host);
-    //console.log("socket status: " + socket.readyState);   
-    
-   //  var $txt = $("#data");
-   //  var $btnSend = $("#sendtext");
-
-   //  $txt.focus();
-
-   //  // event handlers for UI
-   //  $btnSend.on('click',function(){
-   //    var text = $txt.val();
-   //    if(text == ""){
-   //      return;
-   //    }
-   //    socket.send(text);
-   //    $txt.val("");    
-   //  });
-
-   //  $txt.keypress(function(evt){
-   //    if(evt.which == 13){
-   //      $btnSend.click();
-   //    }
-   //  });
-
-    // event handlers for websocket
-    if(socket){
-
-      socket.onopen = function(){
-        //alert("connection opened....");
-      }
-
-      socket.onmessage = function(msg){
-        showServerResponse(msg.data);
-      }
-
-      socket.onclose = function(){
-        //alert("connection closed....");
-        showServerResponse("The connection has been closed.");
-      }
-
-    }else{
-      console.log("invalid socket");
+    if (!("WebSocket" in window)) {
+      alert("Your browser does not support web sockets");
+    } else {
+      setup();
     }
 
-    function showServerResponse(txt){
-      var p = document.createElement('p');
-      p.innerHTML = txt;
-      document.getElementById('output').appendChild(p); 
-    }	
+
+    function setup() {
+
+      // Note: You have to change the host var 
+      // if your client runs on a different machine than the websocket server
+
+      // var host = "ws://localhost:80/ws";
+      var host = "ws://" + window.location.host + "/ws";
+      var socket = new WebSocket(host);
+      //console.log("socket status: " + socket.readyState);   
+
+      //  var $txt = $("#data");
+      //  var $btnSend = $("#sendtext");
+
+      //  $txt.focus();
+
+      //  // event handlers for UI
+      //  $btnSend.on('click',function(){
+      //    var text = $txt.val();
+      //    if(text == ""){
+      //      return;
+      //    }
+      //    socket.send(text);
+      //    $txt.val("");    
+      //  });
+
+      //  $txt.keypress(function(evt){
+      //    if(evt.which == 13){
+      //      $btnSend.click();
+      //    }
+      //  });
+
+      // event handlers for websocket
+      if (socket) {
+
+        socket.onopen = function () {
+          //alert("connection opened....");
+        }
+
+        socket.onmessage = function (msg) {
+          if (JSON.parse(msg.data)['lb']) {
+            updateLeaderBoard(msg.data)
+          }
+          else { showTweet(msg.data); }
+        }
+
+        socket.onclose = function () {
+          //alert("connection closed....");
+          showTweet("The connection has been closed.");
+        }
+
+      } else {
+        console.log("invalid socket");
+      }
+
+      function showTweet(txt) {
+        var p = document.createElement('p');
+        p.innerHTML = txt;
+        document.getElementById('output').appendChild(p);
+      }
 
 
-  }
 
-});
+    }
 
+  });
+  function updateLeaderBoard(msg) {
+        document.getElementById('lb').innerHTML = msg;
+      }
 </script>
