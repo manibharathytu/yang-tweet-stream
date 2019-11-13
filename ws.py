@@ -36,6 +36,8 @@
 # server.serve_forever()
 global ws
 ws = []
+leaderboard = {}
+import json
 
 def start_ws_server():
     import tornado.ioloop
@@ -55,7 +57,8 @@ def start_ws_server():
             print 'connection opened...'
             global ws
             ws.append(self)
-            self.write_message("Live YangGang tweets stream is starting...")
+            lb = {'lb':leaderboard}
+            self.write_message(lb)
 
         def on_message(self, message):
             self.write_message("The server says: " + message + " back at you")
@@ -77,12 +80,36 @@ def start_ws_server():
     
     start()
 
+
+#Tweet class with all the information we need for this program (Hashtags and the actual tweet text)
+class Tweet:
+        text = str()
+	hashtags = []
+
+        def __init__(self, json):
+		self.text = json["text"] 
+		self.username = json["user"]["screen_name"]
+		self.hashtags = json["entities"]["hashtags"]
+
 def send_all(msg):
+    jsonData = json.loads(msg)
+    tweet = Tweet(jsonData)
+    update_lb(str(tweet.username))
+
+    print(tweet.text.encode('utf-8'))
+    print(tweet.username.encode('utf-8'))
+    print(tweet.hashtags)
     for conn in ws :
         try:
-            conn.write_message(msg)
+            conn.write_message(json.dumps((tweet.__dict__)))
         except:
             print("exception in conn.write_message")
+
+def update_lb(name):
+    try :
+        leaderboard[name] = leaderboard[name] + 1
+    except KeyError:
+        leaderboard[name] = 1
 
 def remove_conn_from_list():
     global ws
