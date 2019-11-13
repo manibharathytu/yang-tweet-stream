@@ -96,9 +96,9 @@ def send_all(msg):
     tweet = Tweet(jsonData)
     update_lb(str(tweet.username))
 
-    print(tweet.text.encode('utf-8'))
-    print(tweet.username.encode('utf-8'))
-    print(tweet.hashtags)
+    # print(tweet.text.encode('utf-8'))
+    # print(tweet.username.encode('utf-8'))
+    # print(tweet.hashtags)
     for conn in ws :
         try:
             conn.write_message(json.dumps((tweet.__dict__)))

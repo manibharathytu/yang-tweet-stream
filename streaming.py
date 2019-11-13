@@ -11,11 +11,7 @@ import ws
 #Basic listener which parses the json, creates a tweet, and sends it to parseTweet
 class TweetListener(StreamListener):
 	def on_data(self, data):
-		# jsonData = json.loads(data)
-		# tweet = Tweet(jsonData)
-		# print(tweet.text.encode('utf-8'))
 		ws.send_all(data)
-		# print(tweet.username.encode('utf-8'))
 		return True
 
 	def on_error(self, status):
