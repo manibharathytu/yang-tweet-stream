@@ -51,7 +51,7 @@ def start_ws_server():
         def get(self):
             loader = tornado.template.Loader(".")
             self.write(loader.load("index.html").generate())
-        
+
         # def set_default_headers(self):
         #     print("setting headers!!!")
         #     self.set_header("Access-Control-Allow-Origin", "*")
@@ -70,7 +70,8 @@ def start_ws_server():
             ws.append(self)
             lb = {'lb':leaderboard}
             self.write_message(lb)
-
+        def check_origin(self, origin):
+            return True     
         def on_message(self, message):
             self.write_message("The server says: " + message + " back at you")
             print 'received:', message
