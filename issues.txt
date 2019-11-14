@@ -5,5 +5,11 @@ tweepy 401 error - time mismatch
 Only lb msg comes but not the tweets - in yanggang.ga live
 urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='stream.twitter.com', port=443): Read timed out.
 
+error 406. continuing...
+
+permission denied when starting but still running
+
+local, local debug, yanggang.ga all not streaming anything
+
 Not clear :
 when yanggang.ga is accessed sometime 'the site cannot be reached' or empty page comes. no idea why.
