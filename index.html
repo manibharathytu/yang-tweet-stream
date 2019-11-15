@@ -239,7 +239,7 @@
           if (json['lb']) {
             updateLeaderBoard(json['lb'])
           }
-          else if (json['winner']) {
+          else if (json['winner'] !== undefined) {
             updateWinnerName(json['winner'])
           }
           else { showTweet(json); }
