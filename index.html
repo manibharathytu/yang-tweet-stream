@@ -159,6 +159,7 @@
       <h2>Daily Leaderboard</h2>
       <table>
         <thead>
+          <td><b>Rank</b></td>
           <td>
             <h3>Yangsta Handle</h3>
           </td>
@@ -308,11 +309,11 @@
     }
     const sorted = sortByValue(msg)
     document.getElementById('lb_tbody').innerHTML = ""
-
+    count = 0
     for (var item in sorted) {
       //  alert(item)
       const tr = document.createElement('tr')
-      tr.innerHTML = '<td>@' + sorted[item] + '</td><td>' + msg[sorted[item]] + '</td>'
+      tr.innerHTML = '<td>'+ ++count +'</td><td>@' + sorted[item] + '</td><td>' + msg[sorted[item]] + '</td>'
       document.getElementById('lb_tbody').append(tr)
     }
   }
