@@ -72,6 +72,7 @@ class Tweet:
 		self.text = json["text"] 
 		self.username = json["user"]["screen_name"]
 		self.hashtags = json["entities"]["hashtags"]
+		self.id = json["id_str"]
 
 def send_tweet(msg):
     jsonData = json.loads(msg)

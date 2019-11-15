@@ -167,6 +167,9 @@
     .tooltip:hover .tooltiptext {
       visibility: visible;
     }
+    .tweetPad{
+      overflow: auto;
+    }
     </style>
 </head>
 
@@ -178,7 +181,7 @@
 </div> -->
 
   <div style="width: 100%; overflow: hidden;">
-    <div id="output" style="width: 70%; height:500px; float: left;overflow: scroll;">
+    <div id="output"  style="width: 70%; height:500px; float: left;overflow: scroll;">
       <h2>Live Yang Gang tweets stream</h2>
     </div>
     <div id="lb" style="margin-left: 75%; height:500px;overflow: scroll;">
@@ -283,10 +286,13 @@
         console.log("invalid socket");
       }
 
+
       function showTweet(tweet) {
         var p = document.createElement('p');
-        p.innerHTML = '<b>' + tweet.username + '</b>' + ' : ' + tweet.text;
+        p.classList.add('tweetPad')
+        p.innerHTML = '<div style="width: 95%; float: left;"><a target="_blank" style="color:black" href="https://twitter.com/'+tweet.username+'"><b>' + tweet.username + '</b></a>' + ' : ' + tweet.text +' '+'</div><div><a target="_blank" href="https://twitter.com/'+tweet.username+'/status/'+tweet.id+'"><button><img style="width:20px;height:20px" src="https://twitter.com/favicon.ico"></button></a><div>';
         document.getElementById('output').appendChild(p);
+        // liveTweetsScrollToBottom()
       }
 
 
@@ -342,8 +348,16 @@
     for (var item in sorted) {
       //  alert(item)
       const tr = document.createElement('tr')
-      tr.innerHTML = '<td>'+ ++count +'</td><td>@' + sorted[item] + '</td><td>' + msg[sorted[item]] + '</td>'
+      const uname = '@'+sorted[item];
+      tr.innerHTML = '<td>'+ ++count +'</td><td><a  style="color:black" target="_blank" href="https://twitter.com/'+uname+'"/>'+uname+'</a></td><td>' + msg[sorted[item]] + '</td>'
       document.getElementById('lb_tbody').append(tr)
     }
   }
+
+  function liveTweetsScrollToBottom() {
+  var elem = document.getElementById('output');
+  elem.scrollTop = elem.scrollHeight;
+}
+  // window.setInterval(liveTweetsScrollToBottom, 5000);
+
 </script>
