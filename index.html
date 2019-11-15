@@ -142,6 +142,32 @@
 <head>
   <title>Yang Gang Live tweets</title>
   <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+  <style>
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      border-bottom: 1px dotted black;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 120px;
+      background-color: black;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px 0;
+    
+      /* Position the tooltip */
+      position: absolute;
+      z-index: 1;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+    }
+    </style>
 </head>
 
 <body>
@@ -156,7 +182,10 @@
       <h2>Live Yang Gang tweets stream</h2>
     </div>
     <div id="lb" style="margin-left: 75%; height:500px;overflow: scroll;">
-      <h2>Daily Leaderboard</h2>
+      <h2 style="margin:0 0 0 0 ">Daily Leaderboard</h2>
+      <div class="tooltip" style="font-size:12px">(What's this?)
+        <span class="tooltiptext">This shows number of YangGang tweets made by each Yangster. List Resets everyday at 00:00 GMT</span>
+      </div>
       <table>
         <thead>
           <td><b>Rank</b></td>

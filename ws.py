@@ -127,7 +127,7 @@ def set_winner():
      winner =   max(leaderboard, key=leaderboard.get)
 def reset_lb_daily():
     import schedule, time
-    schedule.every().day.at("05:00").do(reset_lb) #00:00 ET is 05:00 in GMT, #yang2020.com follows ET
+    schedule.every().day.at("00:00").do(reset_lb) #00:00 ET is 05:00 in GMT, #yang2020.com follows ET
     while True: 
   
     # Checks whether a scheduled task  
