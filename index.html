@@ -151,21 +151,36 @@
     <input type="button" id="sendtext" value="send text"/>
 </div> -->
 
-<div style="width: 100%; overflow: hidden;">
-  <div id="output" style="width: 70%; height:500px; float: left;overflow: scroll;"> <h2>Live Yang Gang tweets stream</h2> </div>
-  <div id="lb" style="margin-left: 75%; height:500px;overflow: scroll;"> <h2>Daily Leaderboard</h2>
-  <table>
-    <thead>
-      <td><h3>Yangsta Name</h3></td>
-      <td><b>Tweets</b></td>
-    </thead>
-    <tbody id="lb_tbody">
+  <div style="width: 100%; overflow: hidden;">
+    <div id="output" style="width: 70%; height:500px; float: left;overflow: scroll;">
+      <h2>Live Yang Gang tweets stream</h2>
+    </div>
+    <div id="lb" style="margin-left: 75%; height:500px;overflow: scroll;">
+      <h2>Daily Leaderboard</h2>
+      <table>
+        <thead>
+          <td>
+            <h3>Yangsta Handle</h3>
+          </td>
+          <td><b>Tweets</b></td>
+        </thead>
+        <tbody id="lb_tbody">
 
-    </tbody>
-  </table> </div>
-</div>
-  <div ></div>
-  <div ></div>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <h3>Yesterday's leaderboard winner : </h3>
+  <div style="width:800px;">
+    <div style="width:100px; float:left;">
+      <img style="height: 100px;" src="https://www.yang2020.com/wp-content/uploads/YangCheer_Animation_MATH_153x238.gif">
+
+    </div>
+    <div style="width:300px; float:left;">
+    <h1 id='winner_name'>@GangUbi </h1>
+  </div>
+  </div>
+
 </body>
 
 </html>
@@ -219,9 +234,12 @@
         }
 
         socket.onmessage = function (msg) {
-          json= JSON.parse(msg.data)
+          json = JSON.parse(msg.data)
           if (json['lb']) {
             updateLeaderBoard(json['lb'])
+          }
+          else if (json['winner']) {
+            updateWinnerName(json['winner'])
           }
           else { showTweet(json); }
         }
@@ -237,7 +255,7 @@
 
       function showTweet(tweet) {
         var p = document.createElement('p');
-        p.innerHTML = '<b>'+tweet.username+'</b>' + ' : ' + tweet.text ;
+        p.innerHTML = '<b>' + tweet.username + '</b>' + ' : ' + tweet.text;
         document.getElementById('output').appendChild(p);
       }
 
@@ -246,51 +264,56 @@
     }
 
   });
+  function updateWinnerName(msg){
+    if(msg){
+    document.getElementById('winner_name').innerHTML = '@'+msg
+    }
+  }
   function updateLeaderBoard(msg) {
     var names = [];
     var tweets = [];
     let bubbleSort = (inputArr) => {
-    let len = inputArr.length;
-    let swapped;
-    do {
+      let len = inputArr.length;
+      let swapped;
+      do {
         swapped = false;
         for (let i = 0; i < len; i++) {
-            if (inputArr[i] < inputArr[i + 1]) {
-                let tmp = inputArr[i];
-                let tmp1 = names[i];
-                inputArr[i] = inputArr[i + 1];
-                names[i] = names[i + 1];
-                inputArr[i + 1] = tmp;
-                names[i + 1] = tmp1;
-                swapped = true;
-            }
+          if (inputArr[i] < inputArr[i + 1]) {
+            let tmp = inputArr[i];
+            let tmp1 = names[i];
+            inputArr[i] = inputArr[i + 1];
+            names[i] = names[i + 1];
+            inputArr[i + 1] = tmp;
+            names[i + 1] = tmp1;
+            swapped = true;
+          }
         }
-    } while (swapped);
-    return inputArr;
-};
-    function sortByValue(jsObj){
+      } while (swapped);
+      return inputArr;
+    };
+    function sortByValue(jsObj) {
 
-    for(var i in jsObj)
-    {
+      for (var i in jsObj) {
         // Push each JSON Object entry in array by [value, key]
-        names.push( i);
+        names.push(i);
 
-        tweets.push( parseInt(jsObj[i]));
-        
-    }
-console.log(names)
-console.log(tweets)
-    bubbleSort(tweets)
+        tweets.push(parseInt(jsObj[i]));
 
-    return names;
-}
-const sorted = sortByValue(msg)
-    for (var item in sorted)
-   { 
-    //  alert(item)
-    const tr = document.createElement('tr')
-     tr.innerHTML = '<td>'+sorted[item]+'</td><td>'+msg[sorted[item]]+'</td>'
-        document.getElementById('lb_tbody').append(tr)
-        }
       }
+      console.log(names)
+      console.log(tweets)
+      bubbleSort(tweets)
+
+      return names;
+    }
+    const sorted = sortByValue(msg)
+    document.getElementById('lb_tbody').innerHTML = ""
+
+    for (var item in sorted) {
+      //  alert(item)
+      const tr = document.createElement('tr')
+      tr.innerHTML = '<td>@' + sorted[item] + '</td><td>' + msg[sorted[item]] + '</td>'
+      document.getElementById('lb_tbody').append(tr)
+    }
+  }
 </script>

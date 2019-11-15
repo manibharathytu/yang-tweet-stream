@@ -13,7 +13,7 @@ from helper import set_interval
 #Basic listener which parses the json, creates a tweet, and sends it to parseTweet
 class TweetListener(StreamListener):
 	def on_data(self, data):
-		ws.send_all(data)
+		ws.send_tweet(data)
 		return not is_ht_updated
 
 	def on_error(self, status):
@@ -45,7 +45,7 @@ global ht_list
 ht_list = ['yanggang']
 global is_ht_updated
 updateFilter()
-set_interval(updateFilter, 10)
+set_interval(updateFilter, 600)
 is_ht_updated = False
 start_stream()
 

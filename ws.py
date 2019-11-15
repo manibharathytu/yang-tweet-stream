@@ -1,43 +1,11 @@
-# from tornado import websocket
-# import tornado.ioloop
 
-# class EchoWebSocket(websocket.WebSocketHandler):
-#     def open(self):
-#         print ("Websocket Opened")
-
-#     def on_message(self, message):
-#         self.write_message(u"You said: %s" % message)
-
-#     def on_close(self):
-#         print ("Websocket closed")
-
-# application = tornado.web.Application([(r"/", EchoWebSocket),])
-
-# if __name__ == "__main__":
-#     application.listen(9000)
-#     tornado.ioloop.IOLoop.instance().start()
-
-# from simple_websocket_server import WebSocketServer, WebSocket
-
-
-# class SimpleEcho(WebSocket):
-#     def handle(self):
-#         # echo message back to client
-#         self.send_message(self.data)
-
-#     def connected(self):
-#         print(self.address, 'connected')
-
-#     def handle_close(self):
-#         print(self.address, 'closed')
-
-
-# server = WebSocketServer('', 8000, SimpleEcho)
-# server.serve_forever()
 global ws
+global winner
 ws = []
 leaderboard = {}
+winner = ""
 import json
+import helper
 
 def start_ws_server():
     import tornado.ioloop
@@ -69,7 +37,9 @@ def start_ws_server():
             global ws
             ws.append(self)
             lb = {'lb':leaderboard}
+            champ = {'winner':winner}
             self.write_message(lb)
+            self.write_message(champ)
         def check_origin(self, origin):
             return True     
         def on_message(self, message):
@@ -103,19 +73,12 @@ class Tweet:
 		self.username = json["user"]["screen_name"]
 		self.hashtags = json["entities"]["hashtags"]
 
-def send_all(msg):
+def send_tweet(msg):
     jsonData = json.loads(msg)
     tweet = Tweet(jsonData)
     update_lb(str(tweet.username))
+    send_to_all(json.dumps(tweet.__dict__))
 
-    # print(tweet.text.encode('utf-8'))
-    # print(tweet.username.encode('utf-8'))
-    # print(tweet.hashtags)
-    for conn in ws :
-        try:
-            conn.write_message(json.dumps((tweet.__dict__)))
-        except:
-            print("exception in conn.write_message")
 
 def update_lb(name):
     try :
@@ -131,9 +94,51 @@ def remove_conn_from_list():
     
     ws = [x for x in ws if x is not None]
     print(ws)
-    
 
+def send_lb():
+    lb = {'lb':leaderboard}
+    send_to_all(lb)
+
+
+def send_winner():
+
+    send_to_all({'winner':winner})
+
+  
+
+def send_to_all(msg):
+    for conn in ws :
+        try:
+            conn.write_message(msg)
+        except:
+            print("exception in conn.write_message")
+
+def reset_lb() :
+    print('reset lb')
+    set_winner()
+    print(winner)
+    global leaderboard
+    leaderboard = {}
+    send_lb()
+    send_winner()
+
+def set_winner():
+     global winner
+     winner =   max(leaderboard, key=leaderboard.get)
+def reset_lb_daily():
+    import schedule, time
+    schedule.every().day.at("00:00").do(reset_lb) 
+    while True: 
+  
+    # Checks whether a scheduled task  
+    # is pending to run or not 
+        schedule.run_pending() 
+        time.sleep(10) 
+
+helper.set_interval(send_lb, 10)
 import threading
 threading.Thread(target=start_ws_server).start()
+threading.Thread(target=reset_lb_daily).start()
+
 
 
