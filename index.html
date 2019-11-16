@@ -149,7 +149,7 @@
       display: inline-block;
       border-bottom: 1px dotted black;
     }
-    
+
     .tooltip .tooltiptext {
       visibility: hidden;
       width: 120px;
@@ -158,36 +158,46 @@
       text-align: center;
       border-radius: 6px;
       padding: 5px 0;
-    
+
       /* Position the tooltip */
       position: absolute;
       z-index: 1;
     }
-    
+
     .tooltip:hover .tooltiptext {
       visibility: visible;
     }
-    .tweetPad{
+
+    .tweetPad {
       overflow: auto;
     }
-    </style>
+    hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+  </style>
 </head>
 
-<body>
+<body >
   <!-- Enter text to send to the websocket server:
 <div id="send">
     <input type="text" id="data" size="100"/><br>
     <input type="button" id="sendtext" value="send text"/>
 </div> -->
-
+<div >
   <div style="width: 100%; overflow: hidden;">
-    <div id="output"  style="width: 70%; height:500px; float: left;overflow: scroll;">
+    <div id="output" style="width: 70%; height:440px; float: left;overflow: scroll;">
       <h2>Live Yang Gang tweets stream</h2>
     </div>
-    <div id="lb" style="margin-left: 75%; height:500px;overflow: scroll;">
+    <div id="lb" style="margin-left: 75%; height:440px;overflow: scroll;">
       <h2 style="margin:0 0 0 0 ">Daily Leaderboard</h2>
       <div class="tooltip" style="font-size:12px">(What's this?)
-        <span class="tooltiptext">This shows number of YangGang tweets made by each Yangster. List Resets everyday at 00:00 GMT</span>
+        <span class="tooltiptext">This shows number of YangGang tweets made by each Yangster. List Resets everyday at
+          00:00 GMT</span>
       </div>
       <table>
         <thead>
@@ -203,17 +213,41 @@
       </table>
     </div>
   </div>
+  <hr/>
+  <div>
+  <div style="width:40%;float:left">
   <h3>Yesterday's leaderboard winner : </h3>
   <div style="width:800px;">
     <div style="width:100px; float:left;">
-      <img style="height: 100px;" src="https://www.yang2020.com/wp-content/uploads/YangCheer_Animation_MATH_153x238.gif">
+      <img style="height: 100px;"
+        src="https://www.yang2020.com/wp-content/uploads/YangCheer_Animation_MATH_153x238.gif">
 
     </div>
     <div style="width:300px; float:left;">
-    <h1 id='winner_name'>@GangUbi </h1>
+      <a><h1 id='winner_name'>@Guardia53402016 </h1></a>
+    </div>
+  </div>
+</div>
+<div style="width:30%;float:left">
+  <h3>Today's tweets count : </h3>
+  <div id='tweets_counter' style="font-size:90px">
+  
   </div>
   </div>
 
+  <div style="width:30%;float:left;">
+    <h3>Tweet rate (per min): </h3>
+    <div id="tweet_rate" style="font-size:90px">
+      <div class="tooltip" style="font-size:12px">
+    <img style="width: 100px;" src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif">
+        
+        <span class="tooltiptext">Need atleast 5 tweets to stream. Please wait...</span>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+</div>
 </body>
 
 </html>
@@ -274,25 +308,32 @@
           else if (json['winner'] !== undefined) {
             updateWinnerName(json['winner'])
           }
-          else { showTweet(json); }
+          else { showTweet(json); 
+          updateLbAndTweetCount()}
         }
 
         socket.onclose = function () {
           //alert("connection closed....");
-          showTweet("The connection has been closed.");
+          showMessage("The connection has been closed. Please refresh the page");
         }
 
       } else {
         console.log("invalid socket");
       }
 
+function showMessage(){
+  var p = document.createElement('p');
+  p.classList.add('tweetPad')
+  p.innerHTML = '<div style="width: 95%; float: left;"><a target="_blank" style="color:black" href="https://twitter.com/' + tweet.username + '"><b>' + tweet.username + '</b></a>' + ' : ' + tweet.text + ' ' + '</div><div><a target="_blank" href="https://twitter.com/' + tweet.username + '/status/' + tweet.id + '"><button><img style="width:20px;height:20px" src="https://twitter.com/favicon.ico"></button></a><div>';
+    document.getElementById('output').appendChild(p);
 
+}
       function showTweet(tweet) {
         var p = document.createElement('p');
         p.classList.add('tweetPad')
-        p.innerHTML = '<div style="width: 95%; float: left;"><a target="_blank" style="color:black" href="https://twitter.com/'+tweet.username+'"><b>' + tweet.username + '</b></a>' + ' : ' + tweet.text +' '+'</div><div><a target="_blank" href="https://twitter.com/'+tweet.username+'/status/'+tweet.id+'"><button><img style="width:20px;height:20px" src="https://twitter.com/favicon.ico"></button></a><div>';
+        p.innerHTML = '<div style="width: 95%; float: left;"><a target="_blank" style="color:black" href="https://twitter.com/' + tweet.username + '"><b>' + tweet.username + '</b></a>' + ' : ' + tweet.text + ' ' + '</div><div><a target="_blank" href="https://twitter.com/' + tweet.username + '/status/' + tweet.id + '"><button><img style="width:20px;height:20px" src="https://twitter.com/favicon.ico"></button></a><div>';
         document.getElementById('output').appendChild(p);
-        // liveTweetsScrollToBottom()
+        liveTweetsScrollToBottom()
       }
 
 
@@ -300,9 +341,15 @@
     }
 
   });
-  function updateWinnerName(msg){
-    if(msg){
-    document.getElementById('winner_name').innerHTML = '@'+msg
+  function updateLbAndTweetCount(){
+    tweets_count++
+    document.getElementById('tweets_counter').innerHTML = tweets_count
+    tweet_time_queue.push(Date.now())
+
+  }
+  function updateWinnerName(msg) {
+    if (msg) {
+      document.getElementById('winner_name').innerHTML = '@' + msg
     }
   }
   function updateLeaderBoard(msg) {
@@ -332,32 +379,62 @@
       for (var i in jsObj) {
         // Push each JSON Object entry in array by [value, key]
         names.push(i);
-
-        tweets.push(parseInt(jsObj[i]));
+        const num = parseInt(jsObj[i])
+        tweets.push(num);
+        tweets_count += num
 
       }
-      console.log(names)
-      console.log(tweets)
+      // console.log(names)
+      // console.log(tweets)
       bubbleSort(tweets)
 
       return names;
     }
+    tweets_count = 0
     const sorted = sortByValue(msg)
+    document.getElementById('tweets_counter').innerHTML = tweets_count
+
     document.getElementById('lb_tbody').innerHTML = ""
     count = 0
     for (var item in sorted) {
       //  alert(item)
       const tr = document.createElement('tr')
-      const uname = '@'+sorted[item];
-      tr.innerHTML = '<td>'+ ++count +'</td><td><a  style="color:black" target="_blank" href="https://twitter.com/'+uname+'"/>'+uname+'</a></td><td>' + msg[sorted[item]] + '</td>'
+      const uname = '@' + sorted[item];
+      tr.innerHTML = '<td>' + ++count + '</td><td><a  style="color:black" target="_blank" href="https://twitter.com/' + uname + '"/>' + uname + '</a></td><td>' + msg[sorted[item]] + '</td>'
       document.getElementById('lb_tbody').append(tr)
     }
   }
 
   function liveTweetsScrollToBottom() {
-  var elem = document.getElementById('output');
-  elem.scrollTop = elem.scrollHeight;
-}
-  // window.setInterval(liveTweetsScrollToBottom, 5000);
+    if (scrollAtBottom) {
+      var elem = document.getElementById('output');
+      elem.scrollTop = elem.scrollHeight;
+    }
+  }
+  
+  function setScrollAtBottom() {
+    const element = document.getElementById('output')
+    if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+      scrollAtBottom = true
+    }
+    else {
+      scrollAtBottom = false
+    }
+  }
+  function calculateTpm(){
+    const len = tweet_time_queue.length
+    if(len > 5){
+    const tpm =  Math.round((len/(tweet_time_queue[len-1] - tweet_time_queue[0]))*60*1000)
+    document.getElementById('tweet_rate').innerHTML = tpm
+    tweet_time_queue = tweet_time_queue.slice(len-6)
+    
+    }
+    
+    // console.log(tweet_time_queue)
+  }
+  var tweets_count = 0
+var tweet_time_queue = []
+  window.setInterval(setScrollAtBottom, 1000);
+  window.setInterval(calculateTpm, 1000);
 
 </script>

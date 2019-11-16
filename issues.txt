@@ -13,3 +13,49 @@ local, local debug, yanggang.ga all not streaming anything
 
 Not clear :
 when yanggang.ga is accessed sometime 'the site cannot be reached' or empty page comes. no idea why.
+
+IMPORTANT :
+stream disconnection happen cos of this below error
+ConnectionError: ('Connection aborted.', error(104, 'Connection reset by peer'))
+
+
+gspread err :
+
+Exception in thread Thread-2260:
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/threading.py", line 801, in __bootstrap_inner
+    self.run()
+  File "/usr/lib/python2.7/threading.py", line 1073, in run
+    self.function(*self.args, **self.kwargs)
+  File "/home/mani/yang-tweet-stream/helper.py", line 8, in func_wrapper
+    func()
+  File "streaming.py", line 28, in updateFilter
+    ht_list_updated = hashtag_updater.sheet_job()
+  File "/home/mani/yang-tweet-stream/hashtag_updater.py", line 16, in sheet_job
+    sheet = client.open('YangGang_Hashtags')
+  File "/home/mani/.local/lib/python2.7/site-packages/gspread/client.py", line 123, in open
+    self.list_spreadsheet_files()
+  File "/home/mani/.local/lib/python2.7/site-packages/gspread/client.py", line 96, in list_spreadsheet_files
+    res = self.request('get', url, params=params).json()
+  File "/home/mani/.local/lib/python2.7/site-packages/gspread/client.py", line 79, in request
+    raise APIError(response)
+APIError: {
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "authError",
+    "message": "Invalid Credentials",
+    "locationType": "header",
+    "location": "Authorization"
+   }
+  ],
+  "code": 401,
+  "message": "Invalid Credentials"
+ }
+}
+
+# when crashing previously ssh also wont work but now site not accessible but ssh works
+
+Minor :
+undefined: undefined in ui when connection is closed
