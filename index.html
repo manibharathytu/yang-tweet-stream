@@ -171,83 +171,88 @@
     .tweetPad {
       overflow: auto;
     }
+
     hr {
-    display: block;
-    height: 1px;
-    border: 0;
-    border-top: 1px solid #ccc;
-    margin: 1em 0;
-    padding: 0;
-}
+      display: block;
+      height: 1px;
+      border: 0;
+      border-top: 1px solid #ccc;
+      margin: 1em 0;
+      padding: 0;
+    }
   </style>
 </head>
 
-<body >
+<body>
   <!-- Enter text to send to the websocket server:
 <div id="send">
     <input type="text" id="data" size="100"/><br>
     <input type="button" id="sendtext" value="send text"/>
 </div> -->
-<div >
-  <div style="width: 100%; overflow: hidden;">
-    <div id="output" style="width: 70%; height:440px; float: left;overflow: scroll;">
-      <h2>Live Yang Gang tweets stream</h2>
-    </div>
-    <div id="lb" style="margin-left: 75%; height:440px;overflow: scroll;">
-      <h2 style="margin:0 0 0 0 ">Daily Leaderboard</h2>
-      <div class="tooltip" style="font-size:12px">(What's this?)
-        <span class="tooltiptext">This shows number of YangGang tweets made by each Yangster. List Resets everyday at
-          00:00 GMT</span>
-      </div>
-      <table>
-        <thead>
-          <td><b>Rank</b></td>
-          <td>
-            <h3>Yangsta Handle</h3>
-          </td>
-          <td><b>Tweets</b></td>
-        </thead>
-        <tbody id="lb_tbody">
-
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <hr/>
   <div>
-  <div style="width:40%;float:left">
-  <h3>Yesterday's leaderboard winner : </h3>
-  <div style="width:800px;">
-    <div style="width:100px; float:left;">
-      <img style="height: 100px;"
-        src="https://www.yang2020.com/wp-content/uploads/YangCheer_Animation_MATH_153x238.gif">
+    <div style="width: 100%; overflow: hidden;">
+      <div id="output" style="width: 70%; height:440px; float: left;overflow: scroll;">
+        <h2>Live Yang Gang tweets stream</h2>
+        <img id="tweet_loading" style="width: 100px;" src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif">
+        <!-- Live stream starting... -->
+      </div>
+      <div id="lb" style="margin-left: 75%; height:440px;overflow: scroll;">
+        <h2 style="margin:0 0 0 0 ">Daily Leaderboard</h2>
+        <div class="tooltip" style="font-size:12px">(What's this?)
+          <span class="tooltiptext">This shows number of YangGang tweets made by each Yangster. List Resets everyday at
+            00:00 GMT</span>
+        </div>
+        <table>
+          <thead>
+            <td><b>Rank</b></td>
+            <td>
+              <h3>Yangsta Handle</h3>
+            </td>
+            <td><b>Tweets</b></td>
+          </thead>
+          <tbody id="lb_tbody">
 
-    </div>
-    <div style="width:300px; float:left;">
-      <a><h1 id='winner_name'>@Guardia53402016 </h1></a>
-    </div>
-  </div>
-</div>
-<div style="width:30%;float:left">
-  <h3>Today's tweets count : </h3>
-  <div id='tweets_counter' style="font-size:90px">
-  
-  </div>
-  </div>
-
-  <div style="width:30%;float:left;">
-    <h3>Tweet rate (per min): </h3>
-    <div id="tweet_rate" style="font-size:90px">
-      <div class="tooltip" style="font-size:12px">
-    <img style="width: 100px;" src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif">
-        
-        <span class="tooltiptext">Need atleast 5 tweets to stream. Please wait...</span>
+          </tbody>
+        </table>
       </div>
     </div>
+    <hr />
+    <div>
+      <div style="width:40%;float:left">
+        <h3>Yesterday's leaderboard winner : </h3>
+        <div style="width:800px;">
+          <div style="width:100px; float:left;">
+            <img style="height: 100px;"
+              src="https://www.yang2020.com/wp-content/uploads/YangCheer_Animation_MATH_153x238.gif">
+
+          </div>
+          <div style="width:300px; float:left;">
+            <a id="winner_name_link" href="https://twitter.com/Guardia53402016" style="color:black">
+              <h1 id='winner_name'>@Guardia53402016 </h1>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div style="width:30%;float:left">
+        <h3>Today's tweets count : </h3>
+        <div id='tweets_counter' style="font-size:90px">
+
+        </div>
+      </div>
+
+      <div style="width:30%;float:left;">
+        <h3>Tweet rate (per min): </h3>
+        <div id="tweet_rate" style="font-size:90px">
+          <div class="tooltip" style="font-size:12px">
+            <img style="width: 100px;" src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif">
+
+            <span class="tooltiptext">Need atleast 5 tweets to stream. Please wait...</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-</div>
+  </div>
 </body>
 
 </html>
@@ -308,8 +313,10 @@
           else if (json['winner'] !== undefined) {
             updateWinnerName(json['winner'])
           }
-          else { showTweet(json); 
-          updateLbAndTweetCount()}
+          else {
+            showTweet(json);
+            updateLbAndTweetCount()
+          }
         }
 
         socket.onclose = function () {
@@ -321,19 +328,26 @@
         console.log("invalid socket");
       }
 
-function showMessage(){
-  var p = document.createElement('p');
-  p.classList.add('tweetPad')
-  p.innerHTML = '<div style="width: 95%; float: left;"><a target="_blank" style="color:black" href="https://twitter.com/' + tweet.username + '"><b>' + tweet.username + '</b></a>' + ' : ' + tweet.text + ' ' + '</div><div><a target="_blank" href="https://twitter.com/' + tweet.username + '/status/' + tweet.id + '"><button><img style="width:20px;height:20px" src="https://twitter.com/favicon.ico"></button></a><div>';
-    document.getElementById('output').appendChild(p);
+      function showMessage() {
+        var p = document.createElement('p');
+        p.classList.add('tweetPad')
+        p.innerHTML = '<div style="width: 95%; float: left;"><a target="_blank" style="color:black" href="https://twitter.com/' + tweet.username + '"><b>' + tweet.username + '</b></a>' + ' : ' + tweet.text + ' ' + '</div><div><a target="_blank" href="https://twitter.com/' + tweet.username + '/status/' + tweet.id + '"><button><img style="width:20px;height:20px" src="https://twitter.com/favicon.ico"></button></a><div>';
+        document.getElementById('output').appendChild(p);
 
-}
+      }
       function showTweet(tweet) {
+        removeLoading()
         var p = document.createElement('p');
         p.classList.add('tweetPad')
         p.innerHTML = '<div style="width: 95%; float: left;"><a target="_blank" style="color:black" href="https://twitter.com/' + tweet.username + '"><b>' + tweet.username + '</b></a>' + ' : ' + tweet.text + ' ' + '</div><div><a target="_blank" href="https://twitter.com/' + tweet.username + '/status/' + tweet.id + '"><button><img style="width:20px;height:20px" src="https://twitter.com/favicon.ico"></button></a><div>';
         document.getElementById('output').appendChild(p);
         liveTweetsScrollToBottom()
+
+      }
+      function removeLoading() {
+        var element = document.getElementById("tweet_loading");
+        if(element)
+        {element.parentNode.removeChild(element);}
       }
 
 
@@ -341,7 +355,7 @@ function showMessage(){
     }
 
   });
-  function updateLbAndTweetCount(){
+  function updateLbAndTweetCount() {
     tweets_count++
     document.getElementById('tweets_counter').innerHTML = tweets_count
     tweet_time_queue.push(Date.now())
@@ -350,6 +364,7 @@ function showMessage(){
   function updateWinnerName(msg) {
     if (msg) {
       document.getElementById('winner_name').innerHTML = '@' + msg
+      document.getElementById('winner_name_link').href = 'https://twitter.com/'+msg
     }
   }
   function updateLeaderBoard(msg) {
@@ -411,7 +426,7 @@ function showMessage(){
       elem.scrollTop = elem.scrollHeight;
     }
   }
-  
+
   function setScrollAtBottom() {
     const element = document.getElementById('output')
     if (element.scrollHeight - element.scrollTop === element.clientHeight) {
@@ -421,19 +436,19 @@ function showMessage(){
       scrollAtBottom = false
     }
   }
-  function calculateTpm(){
+  function calculateTpm() {
     const len = tweet_time_queue.length
-    if(len > 5){
-    const tpm =  Math.round((len/(tweet_time_queue[len-1] - tweet_time_queue[0]))*60*1000)
-    document.getElementById('tweet_rate').innerHTML = tpm
-    tweet_time_queue = tweet_time_queue.slice(len-6)
-    
+    if (len > 5) {
+      const tpm = Math.round((len / (tweet_time_queue[len - 1] - tweet_time_queue[0])) * 60 * 1000)
+      document.getElementById('tweet_rate').innerHTML = tpm
+      tweet_time_queue = tweet_time_queue.slice(len - 6)
+
     }
-    
+
     // console.log(tweet_time_queue)
   }
   var tweets_count = 0
-var tweet_time_queue = []
+  var tweet_time_queue = []
   window.setInterval(setScrollAtBottom, 1000);
   window.setInterval(calculateTpm, 1000);
 
