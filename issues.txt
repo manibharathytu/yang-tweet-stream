@@ -57,5 +57,7 @@ APIError: {
 
 # when crashing previously ssh also wont work but now site not accessible but ssh works
 
+gspread : exceeded max number of retrys
+
 Minor :
 undefined: undefined in ui when connection is closed
