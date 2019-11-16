@@ -233,15 +233,21 @@
           </div>
         </div>
       </div>
-      <div style="width:30%;float:left">
-        <h3>Today's tweets count : </h3>
+      <div style="width:30%;float:left;">
+        <h3 style="margin-bottom: 0;">Today's tweets count : </h3>
+        <div class="tooltip" style="font-size:12px">(What's this?)
+          <span class="tooltiptext">This shows number of YangGang tweets made since today 00:00 GMT</span>
+        </div>
         <div id='tweets_counter' style="font-size:90px">
 
         </div>
       </div>
 
       <div style="width:30%;float:left;">
-        <h3>Tweet rate (per min): </h3>
+        <h3 style="margin-bottom: 0;">Tweet rate (per min): </h3>
+        <div class="tooltip" style="font-size:12px">(What's this?)
+          <span class="tooltiptext">Rolling average over one minute span</span>
+        </div>
         <div id="tweet_rate" style="font-size:90px">
           <div class="tooltip" style="font-size:12px">
             <img style="width: 100px;" src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif">
@@ -438,14 +444,23 @@
   }
   function calculateTpm() {
     const len = tweet_time_queue.length
-    if (len > 5) {
-      const tpm = Math.round((len / (tweet_time_queue[len - 1] - tweet_time_queue[0])) * 60 * 1000)
-      document.getElementById('tweet_rate').innerHTML = tpm
-      tweet_time_queue = tweet_time_queue.slice(len - 6)
-
-    }
+      //const tpm = Math.round((len / (tweet_time_queue[len - 1] - tweet_time_queue[0])) * 60 * 1000)
+      document.getElementById('tweet_rate').innerHTML = len
+      spliceTimeArray()
 
     // console.log(tweet_time_queue)
+  }
+  function spliceTimeArray(){
+    let index = 0
+    const now = Date.now()
+    for (i in tweet_time_queue){
+      if(now - tweet_time_queue[i] < 60000){
+        index = i;
+        break;
+      }
+    }
+    tweet_time_queue = tweet_time_queue.slice(index)
+    
   }
   var tweets_count = 0
   var tweet_time_queue = []
