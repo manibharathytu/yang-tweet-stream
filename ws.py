@@ -6,6 +6,7 @@ leaderboard = {}
 winner = ""
 import json
 import helper
+import pickle
 
 def start_ws_server():
     import tornado.ioloop
@@ -136,7 +137,32 @@ def reset_lb_daily():
         schedule.run_pending() 
         time.sleep(10) 
 
+def backup_mem():
+    with open('lb.pickle', 'wb') as handle:
+            pickle.dump(leaderboard, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('winner.pickle', 'wb') as handle:
+            pickle.dump(winner, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+def load_data():
+    global leaderboard
+    global winner
+    if is_same_day() :
+        try :
+            with open('lb.pickle', 'rb') as handle:
+                leaderboard = pickle.load(handle)
+            with open('winner.pickle', 'rb') as handle:
+                winner = pickle.load(handle)
+        except :
+            print('backup error') 
+
+def is_same_day():   
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    backup_date = datetime.fromtimestamp(os.stat('lb.pickle').st_mtime).strftime('%Y-%m-%d')
+    return current_date == backup_date
+    
+load_data()
 helper.set_interval(send_lb, 10)
+helper.set_interval(backup_mem, 100)
 import threading
 threading.Thread(target=start_ws_server).start()
 threading.Thread(target=reset_lb_daily).start()
