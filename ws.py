@@ -157,10 +157,13 @@ def load_data():
         except :
             print('backup error') 
 
-def is_same_day():   
-    current_date = datetime.now().strftime('%Y-%m-%d')
-    backup_date = datetime.fromtimestamp(os.stat('lb.pickle').st_mtime).strftime('%Y-%m-%d')
-    return current_date == backup_date
+def is_same_day(): 
+    try:  
+        current_date = datetime.now().strftime('%Y-%m-%d')
+        backup_date = datetime.fromtimestamp(os.stat('lb.pickle').st_mtime).strftime('%Y-%m-%d')
+        return current_date == backup_date
+    except:
+        return False
     
 load_data()
 helper.set_interval(send_lb, 10)
