@@ -58,15 +58,17 @@ def start_ws_server():
 
 
     def start():
+            global server_ioloop
             application = tornado.web.Application([
         (r'/ws', WSHandler),
         (r'/', MainHandler),
         (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./resources"}),
         ])
             port = int(os.environ.get("PORT", "8080"))
+            server_ioloop = tornado.ioloop.IOLoop.current()
             application.listen(port, address="0.0.0.0")
             print("listening on", port)
-            tornado.ioloop.IOLoop.instance().start()
+            server_ioloop.start()
     
     start()
 
@@ -115,12 +117,28 @@ def send_winner():
 
   
 
+server_ioloop = None
+
 def send_to_all(msg):
-    for conn in ws :
-        try:
-            conn.write_message(msg)
-        except:
-            print("exception in conn.write_message")
+    def _send():
+        dead = []
+        for conn in list(ws):
+            try:
+                conn.write_message(msg)
+            except Exception:
+                print("exception in conn.write_message")
+                dead.append(conn)
+        if dead:
+            for conn in dead:
+                if conn in ws:
+                    ws.remove(conn)
+
+    # Tornado 6 loops are per-thread. Timers and the Twitter thread have to
+    # hop back to the server loop; IOLoop.instance() is not a shared singleton.
+    if server_ioloop is not None:
+        server_ioloop.add_callback(_send)
+    else:
+        _send()
 
 def reset_lb() :
     print('reset lb')
