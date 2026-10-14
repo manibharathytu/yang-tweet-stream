@@ -4,6 +4,7 @@ global winner
 ws = []
 leaderboard = {}
 winner = ""
+tracked = ["yanggang"]
 import json
 import helper
 import pickle
@@ -36,21 +37,23 @@ def start_ws_server():
 
     class WSHandler(tornado.websocket.WebSocketHandler):
         def open(self):
-            print 'connection opened...'
+            print("connection opened...")
             global ws
             ws.append(self)
             lb = {'lb':leaderboard}
             champ = {'winner':winner}
+            tags = {'ht': tracked}
             self.write_message(lb)
             self.write_message(champ)
+            self.write_message(tags)
         def check_origin(self, origin):
             return True     
         def on_message(self, message):
             self.write_message("The server says: " + message + " back at you")
-            print 'received:', message
+            print("received:", message)
 
         def on_close(self):
-            print 'stream closed...'
+            print("stream closed...")
             remove_conn_from_list()
 
 
@@ -60,7 +63,9 @@ def start_ws_server():
         (r'/', MainHandler),
         (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./resources"}),
         ])
-            application.listen(80)
+            port = int(os.environ.get("PORT", "8080"))
+            application.listen(port, address="0.0.0.0")
+            print("listening on", port)
             tornado.ioloop.IOLoop.instance().start()
     
     start()

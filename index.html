@@ -141,7 +141,7 @@
 
 <head>
   <title>Yang Gang Live tweets</title>
-  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
 
   <style>
     .tooltip {
@@ -288,7 +288,8 @@
       // if your client runs on a different machine than the websocket server
 
       // var host = "ws://localhost:80/ws";
-      var host = "ws://" + window.location.host + "/ws";
+      var wsProto = window.location.protocol === "https:" ? "wss://" : "ws://";
+      var host = wsProto + window.location.host + "/ws";
       var socket = new WebSocket(host);
       //console.log("socket status: " + socket.readyState);   
 
@@ -317,7 +318,8 @@
       if (socket) {
 
         socket.onopen = function () {
-          //alert("connection opened....");
+          removeLoading()
+          showMessage("Connected. Waiting for live tweets...")
         }
 
         socket.onmessage = function (msg) {
@@ -327,6 +329,9 @@
           }
           else if (json['winner'] !== undefined) {
             updateWinnerName(json['winner'])
+          }
+          else if (json['ht']) {
+            updateTracked(json['ht'])
           }
           else {
             showTweet(json);
@@ -343,12 +348,17 @@
         console.log("invalid socket");
       }
 
-      function showMessage() {
+      function showMessage(text) {
         var p = document.createElement('p');
         p.classList.add('tweetPad')
-        p.innerHTML = '<div style="width: 95%; float: left;"><a target="_blank" style="color:black" href="https://twitter.com/' + tweet.username + '"><b>' + tweet.username + '</b></a>' + ' : ' + tweet.text + ' ' + '</div><div><a target="_blank" href="https://twitter.com/' + tweet.username + '/status/' + tweet.id + '"><button><img style="width:20px;height:20px" src="https://twitter.com/favicon.ico"></button></a><div>';
+        p.textContent = text;
         document.getElementById('output').appendChild(p);
-
+      }
+      function updateTracked(tags) {
+        var shown = tags.map(function (tag) {
+          return tag.charAt(0) === '#' ? tag : '#' + tag;
+        });
+        document.getElementById('ht_tracked').textContent = shown.join(' ');
       }
       function showTweet(tweet) {
         removeLoading()

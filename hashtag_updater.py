@@ -15,11 +15,14 @@ def sheet_job():
 
     sheet = client.open('YangGang_Hashtags')
     sheet1 = sheet.sheet1
- 
-    result = sheet1.get_all_records()
-    ht=[]
-    for item in result :
-        ht.append(item['YG_Hashtags'])
+
+    # Column A is the tracked tag list. get_all_records() fails because the
+    # header row also has duplicate empty cells.
+    rows = sheet1.get_all_values()
+    ht = []
+    for row in rows[1:]:
+        if row and row[0].strip():
+            ht.append(row[0].strip())
     return ht
 
 
