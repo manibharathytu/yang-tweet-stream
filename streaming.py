@@ -18,7 +18,9 @@ class TweetListener(StreamListener):
 		return not is_ht_updated
 
 	def on_error(self, status):
-		print (status)
+		print(status)
+		self.failed = True
+		return False
 
 
 
@@ -43,12 +45,14 @@ def updateFilter():
 
 # if __name__ == '__main__':
 def start_stream():
-	listener = TweetListener()
 	auth = oauthHandler.getAuth()
 	while True:
 		try:
+			listener = TweetListener()
 			stream = Stream(auth, listener)
 			stream.filter(track=ht_list) #This will start the stream and make callbacks to the listener for all tweets containing "android"
+			if getattr(listener, "failed", False):
+				time.sleep(60)
 		except Exception as exc:
 			print("stream error:", type(exc).__name__, str(exc)[:200])
 			time.sleep(60)

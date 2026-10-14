@@ -74,13 +74,13 @@ def start_ws_server():
 #Tweet class with all the information we need for this program (Hashtags and the actual tweet text)
 class Tweet:
         text = str()
-	hashtags = []
+        hashtags = []
 
         def __init__(self, json):
-		self.text = json["text"] 
-		self.username = json["user"]["screen_name"]
-		self.hashtags = json["entities"]["hashtags"]
-		self.id = json["id_str"]
+                self.text = json["text"]
+                self.username = json["user"]["screen_name"]
+                self.hashtags = json["entities"]["hashtags"]
+                self.id = json["id_str"]
 
 def send_tweet(msg):
     jsonData = json.loads(msg)
