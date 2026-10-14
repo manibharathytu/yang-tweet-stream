@@ -4,6 +4,7 @@ global winner
 ws = []
 leaderboard = {}
 winner = ""
+tracked = ["yanggang"]
 import json
 import helper
 import pickle
@@ -36,32 +37,38 @@ def start_ws_server():
 
     class WSHandler(tornado.websocket.WebSocketHandler):
         def open(self):
-            print 'connection opened...'
+            print("connection opened...")
             global ws
             ws.append(self)
             lb = {'lb':leaderboard}
             champ = {'winner':winner}
+            tags = {'ht': tracked}
             self.write_message(lb)
             self.write_message(champ)
+            self.write_message(tags)
         def check_origin(self, origin):
             return True     
         def on_message(self, message):
             self.write_message("The server says: " + message + " back at you")
-            print 'received:', message
+            print("received:", message)
 
         def on_close(self):
-            print 'stream closed...'
+            print("stream closed...")
             remove_conn_from_list()
 
 
     def start():
+            global server_ioloop
             application = tornado.web.Application([
         (r'/ws', WSHandler),
         (r'/', MainHandler),
         (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./resources"}),
         ])
-            application.listen(80)
-            tornado.ioloop.IOLoop.instance().start()
+            port = int(os.environ.get("PORT", "8080"))
+            server_ioloop = tornado.ioloop.IOLoop.current()
+            application.listen(port, address="0.0.0.0")
+            print("listening on", port)
+            server_ioloop.start()
     
     start()
 
@@ -69,13 +76,13 @@ def start_ws_server():
 #Tweet class with all the information we need for this program (Hashtags and the actual tweet text)
 class Tweet:
         text = str()
-	hashtags = []
+        hashtags = []
 
         def __init__(self, json):
-		self.text = json["text"] 
-		self.username = json["user"]["screen_name"]
-		self.hashtags = json["entities"]["hashtags"]
-		self.id = json["id_str"]
+                self.text = json["text"]
+                self.username = json["user"]["screen_name"]
+                self.hashtags = json["entities"]["hashtags"]
+                self.id = json["id_str"]
 
 def send_tweet(msg):
     jsonData = json.loads(msg)
@@ -110,12 +117,28 @@ def send_winner():
 
   
 
+server_ioloop = None
+
 def send_to_all(msg):
-    for conn in ws :
-        try:
-            conn.write_message(msg)
-        except:
-            print("exception in conn.write_message")
+    def _send():
+        dead = []
+        for conn in list(ws):
+            try:
+                conn.write_message(msg)
+            except Exception:
+                print("exception in conn.write_message")
+                dead.append(conn)
+        if dead:
+            for conn in dead:
+                if conn in ws:
+                    ws.remove(conn)
+
+    # Tornado 6 loops are per-thread. Timers and the Twitter thread have to
+    # hop back to the server loop; IOLoop.instance() is not a shared singleton.
+    if server_ioloop is not None:
+        server_ioloop.add_callback(_send)
+    else:
+        _send()
 
 def reset_lb() :
     print('reset lb')

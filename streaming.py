@@ -4,6 +4,7 @@
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
+import time
 import oauthHandler
 import ws
 import hashtag_updater
@@ -17,7 +18,9 @@ class TweetListener(StreamListener):
 		return not is_ht_updated
 
 	def on_error(self, status):
-		print (status)
+		print(status)
+		self.failed = True
+		return False
 
 
 
@@ -25,21 +28,34 @@ def updateFilter():
 	global ht_list
 	global is_ht_updated
 
-	ht_list_updated = hashtag_updater.sheet_job()
+	try:
+		ht_list_updated = hashtag_updater.sheet_job()
+	except Exception as exc:
+		print("hashtag sheet error:", type(exc).__name__, str(exc)[:200])
+		ws.tracked = ht_list
+		return
 	if set(ht_list) == set(ht_list_updated):
 		is_ht_updated = False
 	else :
 		ht_list = ht_list_updated
 		is_ht_updated = True
+	ws.tracked = ht_list
+	ws.send_to_all({'ht': ht_list})
 
 
 # if __name__ == '__main__':
 def start_stream():
-	listener = TweetListener()
 	auth = oauthHandler.getAuth()
-	stream = Stream(auth, listener)	
 	while True:
-		stream.filter(track=ht_list) #This will start the stream and make callbacks to the listener for all tweets containing "android"
+		try:
+			listener = TweetListener()
+			stream = Stream(auth, listener)
+			stream.filter(track=ht_list) #This will start the stream and make callbacks to the listener for all tweets containing "android"
+			if getattr(listener, "failed", False):
+				time.sleep(60)
+		except Exception as exc:
+			print("stream error:", type(exc).__name__, str(exc)[:200])
+			time.sleep(60)
 
 global ht_list
 ht_list = ['yanggang']
